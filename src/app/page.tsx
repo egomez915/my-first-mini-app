@@ -5,7 +5,6 @@ import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  // Usamos unknown para el usuario autenticado
   const [user, setUser] = useState<unknown>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,15 +19,14 @@ export default function Home() {
         const res = await fetch("/api/nonce");
         const { nonce } = await res.json();
 
-        // 2. Autenticar con Worldcoin
-        const payload = await kit.walletAuth({
+        // 2. Autenticar con Worldcoin usando el método correcto
+        const payload = await kit.commandsAsync.walletAuth({
           nonce,
           statement: "Login to Cambiaya",
         });
 
         setUser(payload);
       } catch (err) {
-        // TypeScript-safe error handling
         setError(
           typeof err === "object" && err !== null && "message" in err
             ? String((err as { message?: unknown }).message)
