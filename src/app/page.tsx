@@ -5,10 +5,11 @@ import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [user, setUser] = useState<any>(null); // <- Cambiamos temporalmente a any para facilitar el renderizado
+  // Tipados seguros
+  const [user, setUser] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [nonce, setNonce] = useState<string | null>(null);
-  const statement = "Sign in";
+  const statement: string = "Sign in";
 
   useEffect(() => {
     // Login automático al cargar la página
@@ -42,11 +43,11 @@ export default function Home() {
   return (
     <Page>
       <Page.Main className="flex flex-col items-center justify-center">
-        <h1 className="text-3xl font-bold mb-4">Hola desde CambiaYA2</h1>
+        <h1 className="text-3xl font-bold mb-4">Hola desde CambiaYA</h1>
         <p className="text-gray-500">Autenticando usuario...</p>
         {/* Mostramos datos útiles */}
         <div style={{ fontSize: 12, color: "#888", margin: 8 }}>
-          <div>nonce: {nonce || "..."}</div>
+          <div>nonce: {nonce ? nonce : "..."}</div>
           <div>statement: {statement}</div>
         </div>
         {user && (
