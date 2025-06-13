@@ -13,14 +13,12 @@ export default function Home() {
     const autoLogin = async () => {
       setError(null);
       try {
-        const kit = new MiniKit();
-
         // 1. Obtener el nonce
         const res = await fetch("/api/nonce");
         const { nonce } = await res.json();
 
-        // 2. Autenticar con Worldcoin usando el método correcto
-        const payload = await kit.commandsAsync.walletAuth({
+        // 2. Autenticar con Worldcoin usando el método estático
+        const payload = await MiniKit.commandsAsync.walletAuth({
           nonce,
           statement: "Login to Cambiaya",
         });
