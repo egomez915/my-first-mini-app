@@ -5,24 +5,21 @@ import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [user, setUser] = useState<unknown>(null); // ✅ Estricto y seguro
+  const [user, setUser] = useState<unknown>(null);
   const [error, setError] = useState<string | null>(null);
   const [nonce, setNonce] = useState<string | null>(null);
-  const statement: string = "Sign in";
+  const statement = "Sign in";
 
   useEffect(() => {
-    // Login automático al cargar la página
     const autoLogin = async () => {
       setError(null);
       try {
-        // 1. Obtener el nonce
         const res = await fetch("/api/nonce");
-        const data = await res.json();
-        setNonce(data.nonce);
+        const data: { nonce?: unknown } = await res.json();
+        setNonce(typeof data.nonce === "string" ? data.nonce : null);
 
-        // 2. Autenticar con Worldcoin usando el método estático
         const payload = await MiniKit.commandsAsync.walletAuth({
-          nonce: data.nonce,
+          nonce: typeof data.nonce === "string" ? data.nonce : "",
           statement,
         });
 
@@ -42,14 +39,16 @@ export default function Home() {
   return (
     <Page>
       <Page.Main className="flex flex-col items-center justify-center">
-        <h1 className="text-3xl font-bold mb-4">Hola desde CambiaYA</h1>
+        <h1 className="text-3xl font-bold mb-4">Hola desde CambiaYA3</h1>
         <p className="text-gray-500">Autenticando usuario...</p>
-        {/* Mostramos datos útiles */}
         <div style={{ fontSize: 12, color: "#888", margin: 8 }}>
-          <div>nonce: {nonce ? nonce : "..."}</div>
-          <div>statement: {statement}</div>
+          <div>
+            nonce:{" "}
+            {nonce !== null && nonce !== undefined ? String(nonce) : "..."}
+          </div>
+          <div>statement: {String(statement)}</div>
         </div>
-        {user && (
+        {typeof user === "object" && user !== null && (
           <div>
             <p className="text-green-600 font-semibold mb-2">
               ¡Autenticado correctamente!
