@@ -39,7 +39,7 @@ export default function Home() {
   return (
     <Page>
       <Page.Main className="flex flex-col items-center justify-center">
-        <h1 className="text-3xl font-bold mb-4">Hola desde CambiaYA3</h1>
+        <h1 className="text-3xl font-bold mb-4">Hola desde CambiaYA4</h1>
         <p className="text-gray-500">Autenticando usuario...</p>
         <div style={{ fontSize: 12, color: "#888", margin: 8 }}>
           <div>
