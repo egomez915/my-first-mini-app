@@ -1,11 +1,54 @@
-import { Page } from '@/components/PageLayout';
-import { AuthButton } from '../components/AuthButton';
+"use client";
+
+import { Page } from "@/components/PageLayout";
+import { MiniKit } from "@worldcoin/minikit-js";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [user, setUser] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Login automático al cargar la página
+    const autoLogin = async () => {
+      setError(null);
+      try {
+        const kit = new MiniKit();
+
+        // 1. Obtener el nonce
+        const res = await fetch("/api/nonce");
+        const { nonce } = await res.json();
+
+        // 2. Autenticar con Worldcoin
+        const payload = await kit.walletAuth({
+          nonce,
+          statement: "Login to Cambiaya",
+        });
+
+        setUser(payload);
+      } catch (err: any) {
+        setError(err.message || "Error en autenticación");
+      }
+    };
+
+    autoLogin();
+  }, []);
+
   return (
     <Page>
       <Page.Main className="flex flex-col items-center justify-center">
-        <AuthButton />
+        <h1 className="text-3xl font-bold mb-4">Hola desde Cambiaya MiniApp</h1>
+        {user ? (
+          <div>
+            <p className="text-green-600 font-semibold mb-2">
+              ¡Autenticado correctamente!
+            </p>
+            <pre className="text-xs">{JSON.stringify(user, null, 2)}</pre>
+          </div>
+        ) : (
+          <p className="text-gray-500">Autenticando usuario...</p>
+        )}
+        {error && <p className="text-red-600 mt-4">{error}</p>}
       </Page.Main>
     </Page>
   );
