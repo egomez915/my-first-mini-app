@@ -20,7 +20,7 @@ export default function Home() {
         // 2. Autenticar con Worldcoin usando el método estático
         const payload = await MiniKit.commandsAsync.walletAuth({
           nonce,
-          statement: "Sign in to CambiaYA",
+          statement: "Sign in",
         });
 
         setUser(payload);
