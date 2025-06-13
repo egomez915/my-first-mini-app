@@ -37,7 +37,7 @@ export default function Home() {
   return (
     <Page>
       <Page.Main className="flex flex-col items-center justify-center">
-        <h1 className="text-3xl font-bold mb-4">Hola desde Cambiaya MiniApp</h1>
+        <h1 className="text-3xl font-bold mb-4">Hola desde CambiaYA</h1>
         {user ? (
           <div>
             <p className="text-green-600 font-semibold mb-2">
