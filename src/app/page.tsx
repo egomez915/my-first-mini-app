@@ -5,7 +5,8 @@ import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [user, setUser] = useState<any>(null);
+  // Usamos unknown para el usuario autenticado
+  const [user, setUser] = useState<unknown>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -26,8 +27,13 @@ export default function Home() {
         });
 
         setUser(payload);
-      } catch (err: any) {
-        setError(err.message || "Error en autenticación");
+      } catch (err) {
+        // TypeScript-safe error handling
+        setError(
+          typeof err === "object" && err !== null && "message" in err
+            ? String((err as { message?: unknown }).message)
+            : "Error en autenticación"
+        );
       }
     };
 
