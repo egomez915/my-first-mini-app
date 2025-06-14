@@ -85,7 +85,7 @@ export default function CambiaYA() {
         setDebugLog(prev => prev + '\nResultado de walletAuth: ' + JSON.stringify(result));
         setDebugLog(prev => prev + '\nfinalPayload: ' + JSON.stringify(result?.finalPayload));
         if (result?.finalPayload?.status === 'success') {
-          setAddress(result.finalPayload.address);
+          setAddress(MiniKit.walletAddress || (typeof window !== 'undefined' && window.MiniKit?.walletAddress) || null);
           window.location.reload();
         } else {
           setAddress(null);
