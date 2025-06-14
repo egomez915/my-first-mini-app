@@ -112,6 +112,27 @@ export default function CambiaYA() {
   const azulGradient =
     "bg-gradient-to-r from-blue-800 via-blue-500 to-cyan-400";
 
+  // Verificación explícita de entorno World App
+  const isWorldApp = typeof window !== 'undefined' && !!window.worldApp && !!window.worldApp.session && !!window.worldApp.session.address;
+
+  // Solo si hay address mostramos la UI, si no mostramos mensaje
+  if (!isWorldApp) {
+    return (
+      <div className="text-center mt-12 text-red-600 text-lg">
+        Debes abrir esta app desde World App para autenticarte.<br />
+        (O aún no se ha recibido la sesión o no estás en el entorno correcto)<br />
+        <span className="block mt-4 text-xs text-gray-700 bg-gray-100 p-2 rounded">
+          <b>window.worldApp:</b><br />
+          {typeof window !== 'undefined' && window.worldApp ? (
+            <pre className="text-left whitespace-pre-wrap">{JSON.stringify(window.worldApp, null, 2)}</pre>
+          ) : (
+            'No existe window.worldApp'
+          )}
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-blue-50 relative pb-20">
       {/* Header moderno */}

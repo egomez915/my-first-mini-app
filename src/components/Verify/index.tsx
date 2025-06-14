@@ -1,6 +1,7 @@
 'use client';
 import { Button, LiveFeedback } from '@worldcoin/mini-apps-ui-kit-react';
 import { MiniKit, VerificationLevel } from '@worldcoin/minikit-js';
+import { useMiniKit } from '@worldcoin/minikit-js/minikit-provider';
 import { useState } from 'react';
 
 /**
@@ -17,6 +18,12 @@ export const Verify = () => {
   const [whichVerification, setWhichVerification] = useState<VerificationLevel>(
     VerificationLevel.Device,
   );
+
+  const { isInstalled } = useMiniKit();
+
+  if (!isInstalled) {
+    return <div className="text-red-600 text-center">MiniKit no está instalado. Abre la app desde World App.</div>;
+  }
 
   const onClickVerify = async (verificationLevel: VerificationLevel) => {
     setButtonState('pending');

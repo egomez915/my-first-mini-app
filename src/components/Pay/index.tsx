@@ -1,6 +1,7 @@
 "use client";
 import { Button, LiveFeedback } from "@worldcoin/mini-apps-ui-kit-react";
 import { MiniKit, Tokens, tokenToDecimals } from "@worldcoin/minikit-js";
+import { useMiniKit } from '@worldcoin/minikit-js/minikit-provider';
 import { useState } from "react";
 
 /**
@@ -12,6 +13,12 @@ export const Pay = () => {
   const [buttonState, setButtonState] = useState<
     "pending" | "success" | "failed" | undefined
   >(undefined);
+
+  const { isInstalled } = useMiniKit();
+
+  if (!isInstalled) {
+    return <div className="text-red-600 text-center">MiniKit no está instalado. Abre la app desde World App.</div>;
+  }
 
   const onClickPay = async () => {
     // Lets use Alex's username to pay!

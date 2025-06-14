@@ -13,6 +13,10 @@ import { getNewNonces } from './server-helpers';
  * @throws {Error} If wallet authentication fails at any step.
  */
 export const walletAuth = async () => {
+  if (typeof window !== 'undefined' && !window.MiniKit) {
+    throw new Error('MiniKit no está instalado. Abre la app desde World App.');
+  }
+
   const { nonce, signedNonce } = await getNewNonces();
 
   const result = await MiniKit.commandsAsync.walletAuth({

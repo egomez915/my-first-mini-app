@@ -7,6 +7,7 @@ import { useWaitForTransactionReceipt } from '@worldcoin/minikit-react';
 import { useEffect, useState } from 'react';
 import { createPublicClient, http } from 'viem';
 import { worldchain } from 'viem/chains';
+import { useMiniKit } from '@worldcoin/minikit-js/minikit-provider';
 
 /**
  * This component is used to get a token from a contract
@@ -48,6 +49,12 @@ export const Transaction = () => {
     },
     transactionId: transactionId,
   });
+
+  const { isInstalled } = useMiniKit();
+
+  if (!isInstalled) {
+    return <div className="text-red-600 text-center">MiniKit no está instalado. Abre la app desde World App.</div>;
+  }
 
   useEffect(() => {
     if (transactionId && !isConfirming) {
