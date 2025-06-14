@@ -26,7 +26,7 @@ const banks = [
   { label: "Daviplata", icon: "" },
 ];
 
-export default function CambioYA() {
+export default function CambiaYA() {
   // Usa el FAKE_ADDRESS aquí; reemplázalo por el real cuando tengas el login implementado
   const address = "0xc7d315bbf4657e664fcc584d0cfe033a0c32bf81"; // TEST! Reemplaza por la que corresponda
 
@@ -91,7 +91,7 @@ export default function CambioYA() {
         />
         <div>
           <h1 className="text-3xl font-black text-white tracking-tight leading-tight">
-            CambioYA
+            CambiaYA
           </h1>
           <span className="text-sm text-white/70">
             Convierte WLD a pesos fácil
