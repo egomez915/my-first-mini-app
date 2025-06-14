@@ -1,5 +1,4 @@
 "use client";
-import { MiniKitProvider } from "@worldcoin/minikit-react";
 import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import dynamic from "next/dynamic";
