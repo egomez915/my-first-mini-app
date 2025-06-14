@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { MiniKit } from '@worldcoin/minikit-js';
 
 declare global {
   interface Window {
@@ -64,10 +65,21 @@ export default function CambiaYA() {
 
   // Al montar el componente, busca la address real de World App
   useEffect(() => {
-    const addr = getWorldAppAddress();
-    setAddress(addr);
-    // DEBUG: puedes quitar este console.log después
-    // if (!addr) console.log("window context:", window);
+    const authenticate = async () => {
+      try {
+        const result = await MiniKit.commandsAsync.walletAuth({
+          // Puedes agregar aquí parámetros como nonce, statement, etc. si tu flujo lo requiere
+        });
+        if (result?.finalPayload?.status === 'success') {
+          setAddress(result.finalPayload.address);
+        } else {
+          setAddress(null);
+        }
+      } catch (e) {
+        setAddress(null);
+      }
+    };
+    authenticate();
   }, []);
 
   const fetchBalance = async () => {
@@ -158,16 +170,7 @@ export default function CambiaYA() {
       {!address ? (
         <div className="text-center mt-12 text-red-600 text-lg">
           Debes abrir esta app desde World App para autenticarte.<br />
-          (O aún no se ha recibido la sesión)
-          <br />
-          <span className="block mt-4 text-xs text-gray-700 bg-gray-100 p-2 rounded">
-            <b>window.worldApp:</b><br />
-            {typeof window !== 'undefined' && window.worldApp ? (
-              <pre className="text-left whitespace-pre-wrap">{JSON.stringify(window.worldApp, null, 2)}</pre>
-            ) : (
-              'No existe window.worldApp'
-            )}
-          </span>
+          (O aún no se ha recibido la sesión o no estás en el entorno correcto)
         </div>
       ) : (
         <>
