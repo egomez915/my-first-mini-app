@@ -69,6 +69,11 @@ export default function CambiaYA() {
     const authenticate = async () => {
       try {
         setDebugLog('MiniKit: ' + JSON.stringify(MiniKit));
+        // Llama a MiniKit.install() si existe
+        if (MiniKit.install) {
+          setDebugLog(prev => prev + '\nLlamando a MiniKit.install()');
+          MiniKit.install();
+        }
         // 1. Obtén el nonce del endpoint
         const res = await fetch("/api/nonce");
         const { nonce } = await res.json();
