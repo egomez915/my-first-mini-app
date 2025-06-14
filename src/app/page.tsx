@@ -136,9 +136,17 @@ export default function CambiaYA() {
       {/* Solo si hay address mostramos la UI, si no mostramos mensaje */}
       {!address ? (
         <div className="text-center mt-12 text-red-600 text-lg">
-          Debes abrir esta app desde World App para autenticarte.
-          <br />
+          Debes abrir esta app desde World App para autenticarte.<br />
           (O aún no se ha recibido la sesión)
+          <br />
+          <span className="block mt-4 text-xs text-gray-700 bg-gray-100 p-2 rounded">
+            <b>window.worldApp:</b><br />
+            {typeof window !== 'undefined' && window.worldApp ? (
+              <pre className="text-left whitespace-pre-wrap">{JSON.stringify(window.worldApp, null, 2)}</pre>
+            ) : (
+              'No existe window.worldApp'
+            )}
+          </span>
         </div>
       ) : (
         <>
@@ -160,7 +168,8 @@ export default function CambiaYA() {
               <span className="text-xl font-medium text-blue-500">WLD</span>
             </div>
             <div className="text-gray-400 text-xs mb-3">
-              ({address.slice(0, 6)}...{address.slice(-4)})
+              {/* Mostrar la dirección completa */}
+              {address}
             </div>
           </section>
 
