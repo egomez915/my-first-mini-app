@@ -4,11 +4,9 @@ import React, { useEffect, useState } from "react";
 // Parámetros principales
 const WLD_TOKEN_ADDRESS = "0x3d8cA8fc8F6eA31d1B95B4e2cF64d40eC0d5f4C0";
 const ETHERSCAN_API_KEY = "H59GZM3Q4QTABG6C82EKMGP5EGK2T1ZA1N";
-const COP_RATE = 3600;
+const COP_RATE = 10000;
 
-// Puedes simular address así (luego reemplaza por la lógica real)
-const FAKE_ADDRESS = "0xc7d315bbf4657e664fcc584d0cfe033a0c32bf81";
-
+// Utilidad para formatear el saldo WLD
 function formatEth(value: string, decimals = 18) {
   if (!value) return "0";
   const num = BigInt(value);
@@ -21,22 +19,47 @@ function formatEth(value: string, decimals = 18) {
     .slice(0, 4)}`;
 }
 
+// Detecta la address real desde World App, si existe
+function getWorldAppAddress() {
+  if (typeof window !== "undefined") {
+    // Prueba varios posibles contextos
+    if (
+      window.worldApp &&
+      window.worldApp.session &&
+      window.worldApp.session.address
+    ) {
+      return window.worldApp.session.address;
+    }
+    // Otros posibles contextos (descomenta si es necesario)
+    // if (window.worldID?.address) return window.worldID.address;
+    // if (window.siwe?.address) return window.siwe.address;
+  }
+  return null;
+}
+
 const banks = [
-  { label: "Nequi", icon: "" },
-  { label: "Daviplata", icon: "" },
+  { label: "Nequi", icon: "💸" },
+  { label: "Daviplata", icon: "🏦" },
+  { label: "Efectivo", icon: "💵" },
+  { label: "Achiras", icon: "🌽" },
 ];
 
 export default function CambiaYA() {
-  // Usa el FAKE_ADDRESS aquí; reemplázalo por el real cuando tengas el login implementado
-  const address = "0xc7d315bbf4657e664fcc584d0cfe033a0c32bf81"; // TEST! Reemplaza por la que corresponda
-
+  const [address, setAddress] = useState<string | null>(null);
   const [wldBalance, setWldBalance] = useState<string>("0.00");
   const [wldInput, setWldInput] = useState<string>("");
   const [copValue, setCopValue] = useState<string>("");
   const [selectedBank, setSelectedBank] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
-  // Consulta saldo WLD desde Etherscan Optimism
+  // Al montar el componente, busca la address real de World App
+  useEffect(() => {
+    const addr = getWorldAppAddress();
+    setAddress(addr);
+    // DEBUG: puedes quitar este console.log después
+    // if (!addr) console.log("window context:", window);
+  }, []);
+
   const fetchBalance = async () => {
     if (!address) return;
     setLoading(true);
@@ -57,7 +80,8 @@ export default function CambiaYA() {
   };
 
   useEffect(() => {
-    fetchBalance();
+    if (address) fetchBalance();
+    // eslint-disable-next-line
   }, [address]);
 
   function handleWldInput(e: React.ChangeEvent<HTMLInputElement>) {
@@ -99,116 +123,125 @@ export default function CambiaYA() {
         </div>
       </header>
 
-      {/* Sección saldo + botón actualizar */}
-      <section className="w-full mt-4 px-6">
-        <div className="flex items-center justify-between">
-          <div className="text-lg text-blue-800/80 font-medium">Saldo WLD</div>
-          <button
-            onClick={fetchBalance}
-            className="text-xs bg-white/30 backdrop-blur rounded-full px-3 py-1 shadow border border-blue-200 text-blue-600 hover:bg-white/70 active:bg-blue-100"
-          >
-            {loading ? "Cargando..." : "Actualizar"}
-          </button>
+      {/* Solo si hay address mostramos la UI, si no mostramos mensaje */}
+      {!address ? (
+        <div className="text-center mt-12 text-red-600 text-lg">
+          Debes abrir esta app desde World App para autenticarte.
+          <br />
+          (O aún no se ha recibido la sesión)
         </div>
-        <div className="text-5xl font-bold my-2 text-blue-900 tracking-tight">
-          {wldBalance}{" "}
-          <span className="text-xl font-medium text-blue-500">WLD</span>
-        </div>
-        <div className="text-gray-400 text-xs mb-3">
-          (
-          {address
-            ? `${address.slice(0, 6)}...${address.slice(-4)}`
-            : "usuario"}
-          )
-        </div>
-      </section>
-
-      {/* Inputs estilo glassmorphism */}
-      <main className="w-full px-6 flex flex-col gap-6 mt-3">
-        {/* Cambiar WLD */}
-        <div className="rounded-xl p-4 bg-white/70 backdrop-blur shadow border border-blue-100">
-          <label className="block text-blue-900 font-bold mb-1">
-            ¿Cuánto quieres cambiar?
-          </label>
-          <div className="flex items-center gap-2 mb-2">
-            <input
-              type="number"
-              min="0"
-              max={wldBalance}
-              step="0.01"
-              className="flex-1 px-4 py-2 rounded-lg border-2 border-blue-200 bg-white/70 text-blue-900 font-semibold focus:ring-2 focus:ring-blue-400 outline-none text-lg"
-              placeholder="0.00"
-              value={wldInput}
-              onChange={handleWldInput}
-            />
-            <img
-              src={wldLogo}
-              alt="WLD"
-              className="w-7 h-7 bg-white rounded-full border border-blue-100"
-            />
-          </div>
-          <button
-            className="text-xs text-cyan-700 underline mb-1 hover:text-blue-500"
-            onClick={() => {
-              setWldInput(wldBalance);
-              setCopValue(
-                (parseFloat(wldBalance) * COP_RATE).toLocaleString("es-CO")
-              );
-            }}
-          >
-            Usar todo mi saldo
-          </button>
-        </div>
-
-        {/* Recibir en COP */}
-        <div className="rounded-xl p-4 bg-white/70 backdrop-blur shadow border border-blue-100">
-          <label className="block text-blue-900 font-bold mb-1">
-            Recibes en pesos
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={copValue}
-              readOnly
-              className="flex-1 px-4 py-2 rounded-lg border-2 border-blue-200 bg-white/70 text-blue-900 font-semibold outline-none text-lg"
-              placeholder="$ 0"
-            />
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Colombia.svg"
-              alt="COP"
-              className="w-7 h-7 rounded-full border border-blue-100"
-            />
-          </div>
-          <div className="text-xs text-blue-400 mt-1">
-            Tasa estimada: ${COP_RATE.toLocaleString("es-CO")} COP / 1 WLD
-          </div>
-        </div>
-
-        {/* Métodos de pago como chips */}
-        <div className="rounded-xl p-4 bg-white/70 backdrop-blur shadow border border-blue-100">
-          <label className="block text-blue-900 font-bold mb-1">
-            Método de pago
-          </label>
-          <div className="flex gap-2 flex-wrap">
-            {banks.map((bank) => (
+      ) : (
+        <>
+          {/* Sección saldo + botón actualizar */}
+          <section className="w-full mt-4 px-6">
+            <div className="flex items-center justify-between">
+              <div className="text-lg text-blue-800/80 font-medium">
+                Saldo WLD
+              </div>
               <button
-                key={bank.label}
-                onClick={() => setSelectedBank(bank.label)}
-                className={`px-4 py-2 rounded-full border-2 transition text-base font-semibold flex items-center gap-1 
+                onClick={fetchBalance}
+                className="text-xs bg-white/30 backdrop-blur rounded-full px-3 py-1 shadow border border-blue-200 text-blue-600 hover:bg-white/70 active:bg-blue-100"
+              >
+                {loading ? "Cargando..." : "Actualizar"}
+              </button>
+            </div>
+            <div className="text-5xl font-bold my-2 text-blue-900 tracking-tight">
+              {wldBalance}{" "}
+              <span className="text-xl font-medium text-blue-500">WLD</span>
+            </div>
+            <div className="text-gray-400 text-xs mb-3">
+              ({address.slice(0, 6)}...{address.slice(-4)})
+            </div>
+          </section>
+
+          {/* Inputs estilo glassmorphism */}
+          <main className="w-full px-6 flex flex-col gap-6 mt-3">
+            {/* Cambiar WLD */}
+            <div className="rounded-xl p-4 bg-white/70 backdrop-blur shadow border border-blue-100">
+              <label className="block text-blue-900 font-bold mb-1">
+                ¿Cuánto quieres cambiar?
+              </label>
+              <div className="flex items-center gap-2 mb-2">
+                <input
+                  type="number"
+                  min="0"
+                  max={wldBalance}
+                  step="0.01"
+                  className="flex-1 px-4 py-2 rounded-lg border-2 border-blue-200 bg-white/70 text-blue-900 font-semibold focus:ring-2 focus:ring-blue-400 outline-none text-lg"
+                  placeholder="0.00"
+                  value={wldInput}
+                  onChange={handleWldInput}
+                />
+                <img
+                  src={wldLogo}
+                  alt="WLD"
+                  className="w-7 h-7 bg-white rounded-full border border-blue-100"
+                />
+              </div>
+              <button
+                className="text-xs text-cyan-700 underline mb-1 hover:text-blue-500"
+                onClick={() => {
+                  setWldInput(wldBalance);
+                  setCopValue(
+                    (parseFloat(wldBalance) * COP_RATE).toLocaleString("es-CO")
+                  );
+                }}
+              >
+                Usar todo mi saldo
+              </button>
+            </div>
+
+            {/* Recibir en COP */}
+            <div className="rounded-xl p-4 bg-white/70 backdrop-blur shadow border border-blue-100">
+              <label className="block text-blue-900 font-bold mb-1">
+                Recibes en pesos
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={copValue}
+                  readOnly
+                  className="flex-1 px-4 py-2 rounded-lg border-2 border-blue-200 bg-white/70 text-blue-900 font-semibold outline-none text-lg"
+                  placeholder="$ 0"
+                />
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Colombia.svg"
+                  alt="COP"
+                  className="w-7 h-7 rounded-full border border-blue-100"
+                />
+              </div>
+              <div className="text-xs text-blue-400 mt-1">
+                Tasa estimada: ${COP_RATE.toLocaleString("es-CO")} COP / 1 WLD
+              </div>
+            </div>
+
+            {/* Métodos de pago como chips */}
+            <div className="rounded-xl p-4 bg-white/70 backdrop-blur shadow border border-blue-100">
+              <label className="block text-blue-900 font-bold mb-1">
+                Método de pago
+              </label>
+              <div className="flex gap-2 flex-wrap">
+                {banks.map((bank) => (
+                  <button
+                    key={bank.label}
+                    onClick={() => setSelectedBank(bank.label)}
+                    className={`px-4 py-2 rounded-full border-2 transition text-base font-semibold flex items-center gap-1 
                   ${
                     selectedBank === bank.label
                       ? "bg-blue-600 text-white border-blue-700 shadow"
                       : "bg-white/80 text-blue-700 border-blue-200 hover:bg-blue-100"
                   }
                 `}
-              >
-                <span className="text-lg">{bank.icon}</span>
-                {bank.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </main>
+                  >
+                    <span className="text-lg">{bank.icon}</span>
+                    {bank.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </main>
+        </>
+      )}
 
       {/* Footer súper minimalista */}
       <footer className="fixed bottom-0 left-0 w-full py-2 bg-white/80 backdrop-blur border-t border-blue-100 flex items-center justify-center gap-8 text-blue-800 font-medium shadow-sm z-50">
