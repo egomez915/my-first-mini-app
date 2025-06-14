@@ -86,6 +86,7 @@ export default function CambiaYA() {
         setDebugLog(prev => prev + '\nfinalPayload: ' + JSON.stringify(result?.finalPayload));
         if (result?.finalPayload?.status === 'success') {
           setAddress(result.finalPayload.address);
+          window.location.reload();
         } else {
           setAddress(null);
         }
