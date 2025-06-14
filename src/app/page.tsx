@@ -1,6 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
+declare global {
+  interface Window {
+    worldApp?: {
+      session?: {
+        address?: string;
+      };
+    };
+  }
+}
+
 // Parámetros principales
 const WLD_TOKEN_ADDRESS = "0x3d8cA8fc8F6eA31d1B95B4e2cF64d40eC0d5f4C0";
 const ETHERSCAN_API_KEY = "H59GZM3Q4QTABG6C82EKMGP5EGK2T1ZA1N";
