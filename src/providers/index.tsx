@@ -1,5 +1,5 @@
 "use client";
-import { MiniKitProvider } from "@worldcoin/minikit-js/minikit-provider";
+import { MiniKitProvider } from "@worldcoin/minikit-react";
 import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import dynamic from "next/dynamic";
@@ -24,7 +24,7 @@ interface ClientProvidersProps {
  *     - Enables an in-browser console for logging and debugging.
  *
  * - MiniKitProvider:
- *     - Required for MiniKit functionality.
+ *     - Required for MiniApp functionality.
  *
  * This component ensures both providers are available to all child components.
  */
@@ -34,7 +34,7 @@ export default function ClientProviders({
 }: ClientProvidersProps) {
   return (
     <ErudaProvider>
-      <MiniKitProvider props={{ appId: process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID! }}>
+      <MiniKitProvider appId={process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID!}>
         <SessionProvider session={session}>{children}</SessionProvider>
       </MiniKitProvider>
     </ErudaProvider>
