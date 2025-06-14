@@ -67,8 +67,14 @@ export default function CambiaYA() {
   useEffect(() => {
     const authenticate = async () => {
       try {
+        // 1. Obtén el nonce del endpoint
+        const res = await fetch("/api/nonce");
+        const { nonce } = await res.json();
+
+        // 2. Llama a walletAuth con el nonce
         const result = await MiniKit.commandsAsync.walletAuth({
-          // Puedes agregar aquí parámetros como nonce, statement, etc. si tu flujo lo requiere
+          nonce,
+          // Puedes agregar otros parámetros si tu flujo lo requiere
         });
         if (result?.finalPayload?.status === 'success') {
           setAddress(result.finalPayload.address);
