@@ -62,11 +62,13 @@ export default function CambiaYA() {
   const [copValue, setCopValue] = useState<string>("");
   const [selectedBank, setSelectedBank] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [debugLog, setDebugLog] = useState<string>("");
 
   // Al montar el componente, busca la address real de World App
   useEffect(() => {
     const authenticate = async () => {
       try {
+        setDebugLog('MiniKit: ' + JSON.stringify(MiniKit));
         // 1. Obtén el nonce del endpoint
         const res = await fetch("/api/nonce");
         const { nonce } = await res.json();
@@ -74,14 +76,15 @@ export default function CambiaYA() {
         // 2. Llama a walletAuth con el nonce
         const result = await MiniKit.commandsAsync.walletAuth({
           nonce,
-          // Puedes agregar otros parámetros si tu flujo lo requiere
         });
+        setDebugLog(prev => prev + '\nResultado de walletAuth: ' + JSON.stringify(result));
         if (result?.finalPayload?.status === 'success') {
           setAddress(result.finalPayload.address);
         } else {
           setAddress(null);
         }
       } catch (e) {
+        setDebugLog(prev => prev + '\nError en authenticate: ' + (e instanceof Error ? e.message : String(e)));
         setAddress(null);
       }
     };
@@ -177,6 +180,12 @@ export default function CambiaYA() {
         <div className="text-center mt-12 text-red-600 text-lg">
           Debes abrir esta app desde World App para autenticarte.<br />
           (O aún no se ha recibido la sesión o no estás en el entorno correcto)
+          <br />
+          {/* Bloque de depuración visible solo para pruebas */}
+          <div className="mt-4 p-2 bg-gray-100 text-xs text-left text-black rounded break-all">
+            <b>Debug log:</b>
+            <pre>{debugLog}</pre>
+          </div>
         </div>
       ) : (
         <>
