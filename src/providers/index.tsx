@@ -34,9 +34,7 @@ export default function ClientProviders({
 }: ClientProvidersProps) {
   return (
     <ErudaProvider>
-      <MiniKitProvider appId={process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID!}>
-        <SessionProvider session={session}>{children}</SessionProvider>
-      </MiniKitProvider>
+      <SessionProvider session={session}>{children}</SessionProvider>
     </ErudaProvider>
   );
 }
