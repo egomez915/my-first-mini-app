@@ -63,6 +63,7 @@ export default function CambiaYA() {
   const [selectedBank, setSelectedBank] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [debugLog, setDebugLog] = useState<string>("");
+  const [nonce, setNonce] = useState<string>("");
 
   // Al montar el componente, busca la address real de World App
   useEffect(() => {
@@ -77,6 +78,7 @@ export default function CambiaYA() {
         // 1. Obtén el nonce del endpoint
         const res = await fetch("/api/nonce");
         const { nonce } = await res.json();
+        setNonce(nonce);
 
         // 2. Llama a walletAuth con el nonce
         const result = await MiniKit.commandsAsync.walletAuth({
@@ -85,12 +87,19 @@ export default function CambiaYA() {
         setDebugLog(prev => prev + '\nResultado de walletAuth: ' + JSON.stringify(result));
         setDebugLog(prev => prev + '\nfinalPayload: ' + JSON.stringify(result?.finalPayload));
         if (result?.finalPayload?.status === 'success') {
-          setAddress(
-            (MiniKit as any).walletAddress ||
-            (typeof window !== 'undefined' && (window as any).MiniKit?.walletAddress) ||
-            null
-          );
-          window.location.reload();
+          // Envía el finalPayload y el nonce al backend para validación
+          const verifyRes = await fetch('/api/complete-siwe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ payload: result.finalPayload, nonce }),
+          });
+          const verifyData = await verifyRes.json();
+          setDebugLog(prev => prev + '\nRespuesta de /api/complete-siwe: ' + JSON.stringify(verifyData));
+          if (verifyData.status === 'success' && verifyData.address) {
+            setAddress(verifyData.address);
+          } else {
+            setAddress(null);
+          }
         } else {
           setAddress(null);
         }
