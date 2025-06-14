@@ -83,6 +83,7 @@ export default function CambiaYA() {
           nonce,
         });
         setDebugLog(prev => prev + '\nResultado de walletAuth: ' + JSON.stringify(result));
+        setDebugLog(prev => prev + '\nfinalPayload: ' + JSON.stringify(result?.finalPayload));
         if (result?.finalPayload?.status === 'success') {
           setAddress(result.finalPayload.address);
         } else {
